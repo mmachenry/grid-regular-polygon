@@ -4,6 +4,10 @@ import Browser
 import Html exposing (Html, div, text, button)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (disabled)
+import Svg exposing (Svg)
+import Svg.Attributes
+import Matrix
+import Array
 
 type Msg =
       IncSides
@@ -47,6 +51,27 @@ view model = {
         button [ onClick IncSides ] [ text "+" ],
         button [ onClick DecRadius, disabled (model.radius <= 1) ] [ text "-" ],
         div [] [ text (String.fromInt model.radius) ],
-        button [ onClick IncRadius ] [ text "+" ]
+        button [ onClick IncRadius ] [ text "+" ],
+        image model
         ]
     }
+
+image : Model -> Html Msg
+image model =
+    let w = 120
+        h = 120
+    in Svg.svg [ Svg.Attributes.width (String.fromInt w),
+                 Svg.Attributes.height (String.fromInt h),
+                 Svg.Attributes.viewBox ("0 0 " ++ String.fromInt w
+                  ++ " " ++ String.fromInt h)]
+            [Svg.rect [Svg.Attributes.width "50", Svg.Attributes.height "50"] []]
+           --(grid w h model)
+
+grid : Int -> Int -> Model -> List (Svg Msg)
+grid width height model =
+    Matrix.generate model.radius model.radius mkRect
+    |> Matrix.toArray 
+    |> Array.toList
+
+mkRect row col = Svg.text (Debug.toString row)
+
